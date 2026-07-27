@@ -14,16 +14,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Run Unity Editor Script
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: ${{ vars.UNITY_VERSION || '2022.3.34f1' }}
-          targetPlatform: StandaloneWindows64
-          customParameters: -executeMethod ErrorHandler.Editor.PackageBuilder.ExportPackage -quit -batchmode -nographics
-          useLicenseServer: true
+      - name: Create Unity Package Manually
+        run: |
+          zip -r VerticalSlice_ErrorHandler.unitypackage Assets
 
       - name: Upload UnityPackage Artifact
         uses: actions/upload-artifact@v4
