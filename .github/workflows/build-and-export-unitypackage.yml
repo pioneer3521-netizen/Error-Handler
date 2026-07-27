@@ -1,0 +1,41 @@
+name: Build Vertical Slice Package
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/ui-tmp-warningfx
+
+jobs:
+  build:
+    name: Build Unity Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Unity Editor Script
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          unityVersion: ${{ vars.UNITY_VERSION || '2022.3.34f1' }}
+          targetPlatform: StandaloneWindows64
+          customParameters: -executeMethod ErrorHandler.Editor.PackageBuilder.ExportPackage -quit -batchmode -nographics
+
+      - name: Upload UnityPackage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VerticalSlicePackage
+          path: VerticalSlice_ErrorHandler.unitypackage
+
+      - name: Commit UnityPackage to Branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: feature/unity-package
+          commit_message: "chore: auto-generate and commit UnityPackage artifact"
+          file_pattern: VerticalSlice_ErrorHandler.unitypackage
+          create_branch: true
