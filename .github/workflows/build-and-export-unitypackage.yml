@@ -14,21 +14,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Request Unity Activation License
-        uses: game-ci/unity-request-activation-file@v4
-        with:
-          unityVersion: ${{ vars.UNITY_VERSION || '2022.3.34f1' }}
-
       - name: Run Unity Editor Script
         uses: game-ci/unity-builder@v4
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           unityVersion: ${{ vars.UNITY_VERSION || '2022.3.34f1' }}
           targetPlatform: StandaloneWindows64
           customParameters: -executeMethod ErrorHandler.Editor.PackageBuilder.ExportPackage -quit -batchmode -nographics
+          useLicenseServer: true
 
       - name: Upload UnityPackage Artifact
         uses: actions/upload-artifact@v4
